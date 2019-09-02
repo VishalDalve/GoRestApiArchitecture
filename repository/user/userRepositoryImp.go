@@ -3,10 +3,11 @@ package user
 import (
 	"context"
 
-	"go-restapis/config"
-	"go-restapis/model"
+	"golang-mongodb-restful-starter-kit/config"
+	"golang-mongodb-restful-starter-kit/model"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UserRepositoryImp struct {
@@ -14,8 +15,8 @@ type UserRepositoryImp struct {
 	config *config.Configuration
 }
 
-func New(db *mgo.Session) UserRepository {
-	return &UserRepositoryImp{db: db}
+func New(db *mgo.Session, c *config.Configuration) UserRepository {
+	return &UserRepositoryImp{db: db, config: c}
 }
 
 func (service *UserRepositoryImp) Create(ctx context.Context, user *model.User) error {
@@ -26,12 +27,16 @@ func (service *UserRepositoryImp) FindAll(ctx context.Context) ([]*model.User, e
 	return nil, nil
 }
 
-func (service *UserRepositoryImp) Update(ctx context.Context, user *model.User) error {
-	return nil
+func (service *UserRepositoryImp) Update(ctx context.Context, query, change interface{}) error {
+
+	return service.collection().Update(query, change)
 }
 
 func (service *UserRepositoryImp) FindOneById(ctx context.Context, id string) (*model.User, error) {
-	return nil, nil
+	var user model.User
+	query := bson.M{"_id": bson.ObjectIdHex(id)}
+	e := service.collection().Find(query).Select(bson.M{"password": 0, "salt": 0}).One(&user)
+	return &user, e
 }
 
 func (service *UserRepositoryImp) Delete(ctx context.Context, user *model.User) error {
@@ -44,6 +49,16 @@ func (service *UserRepositoryImp) FindOne(ctx context.Context, query interface{}
 	return &user, e
 }
 
+// IsUserAlreadyExists , checks if user already exists in DB
+func (service *UserRepositoryImp) IsUserAlreadyExists(ctx context.Context, email string) bool {
+	query := bson.M{"email": email}
+	_, e := service.FindOne(ctx, query)
+	if e != nil {
+		return false
+	}
+	return true
+}
+
 func (service *UserRepositoryImp) collection() *mgo.Collection {
-	return service.db.DB("go-restapis").C("user")
+	return service.db.DB(service.config.DataBaseName).C("users")
 }

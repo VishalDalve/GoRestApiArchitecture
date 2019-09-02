@@ -2,10 +2,11 @@ package auth
 
 import (
 	"context"
-	"go-restapis/model"
+	"golang-mongodb-restful-starter-kit/model"
 )
 
 type AuthService interface {
 	Create(context.Context, *model.User) error
 	Login(context.Context, *model.Credential) (*model.User, error)
+	IsUserAlreadyExists(context.Context, string) bool
 }

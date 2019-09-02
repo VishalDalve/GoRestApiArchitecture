@@ -1,15 +1,15 @@
 package jwt
 
 import (
-	"go-restapis/config"
-	"go-restapis/core/httphandler"
+	"golang-mongodb-restful-starter-kit/config"
+	"golang-mongodb-restful-starter-kit/utility"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/context"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // JwtToken , basic jwt model
@@ -29,7 +29,7 @@ type Token struct {
 // CreateToken : takes userId as parameter,
 // generates JWT token and
 // Return JWT token string
-func (jt *JwtToken) CreateToken(id, role string) (interface{}, error) {
+func (jt *JwtToken) CreateToken(id, role string) (map[string]string, error) {
 
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), &Token{
 		ID:   id,
@@ -66,7 +66,7 @@ func (jt *JwtToken) ProtectedEndpoint(h http.Handler) http.Handler {
 				return []byte(jt.C.JwtSecret), nil
 			})
 			if !token.Valid || err != nil {
-				httphandler.Response(w, httphandler.NewHTTPError(httphandler.Unauthorized, http.StatusUnauthorized))
+				utility.Response(w, utility.NewHTTPError(utility.Unauthorized, http.StatusUnauthorized))
 			} else {
 
 				// Set userId and in context, so that we can access it over the request

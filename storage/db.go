@@ -1,7 +1,7 @@
-package store
+package storage
 
 import (
-	"go-restapis/config"
+	"golang-mongodb-restful-starter-kit/config"
 	"sync"
 	"sync/atomic"
 
@@ -26,7 +26,7 @@ func GetInstance(c *config.Configuration) *mgo.Session {
 	defer mux.Unlock()
 
 	if instanace == nil {
-		instanace, err = mgo.Dial(c.DatabaseConnectionURL)
+		instanace, err = mgo.Dial(c.DataBaseConnectionURL)
 		if err != nil {
 			panic(err)
 		}

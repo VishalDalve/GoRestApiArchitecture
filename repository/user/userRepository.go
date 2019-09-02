@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"go-restapis/model"
+	"golang-mongodb-restful-starter-kit/model"
 )
 
 // UserRepository , used to perform DB oprations
@@ -24,7 +24,7 @@ type UserRepository interface {
 
 	// Update, will update user data by id
 	// return error if any
-	Update(context.Context, *model.User) error
+	Update(context.Context, interface{}, interface{}) error
 
 	// Delete, will remove user entry from DB
 	// Return error if any
@@ -34,4 +34,6 @@ type UserRepository interface {
 	// Query object is an interface type that can accept any object
 	// return matched user and error if any
 	FindOne(context.Context, interface{}) (*model.User, error)
+
+	IsUserAlreadyExists(context.Context, string) bool
 }

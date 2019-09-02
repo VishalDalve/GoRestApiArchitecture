@@ -2,10 +2,10 @@ package user
 
 import (
 	"context"
-	"go-restapis/model"
+	"golang-mongodb-restful-starter-kit/model"
 )
 
 type UserService interface {
-	Update(context.Context, *model.User) error
+	Update(context.Context, string, *model.UserUpdate) error
 	Get(context.Context, string) (*model.User, error)
 }
